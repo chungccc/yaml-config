@@ -1,6 +1,11 @@
-#更新日期：2026年8月28日
+#更新日期：2026年10月13日
 #订阅健康检查锚点
-health-check: &hc {enable: true, url: http://cp.cloudflare.com/generate_204, lazy: true, interval: 300, timeout: 3000}
+health-check: &hc {enable: true, url: https://cp.cloudflare.com/generate_204, lazy: true, interval: 300, timeout: 3000}
+#url-test策略锚点
+urltest: &urltest {type: url-test, include-all: true, url: "https://cp.cloudflare.com/generate_204", interval: 300, tolerance: 20, lazy: true}
+# SMART策略 公共参数锚点
+smart: &smart {type: smart, uselightgbm: true, collectdata: false, include-all: true, prefer-asn: true, tolerance: 50}
+
 proxy-providers:
   机场A:
     health-check: *hc
@@ -143,60 +148,112 @@ lgbm-auto-update: true
 lgbm-update-interval: 48
 lgbm-url: "https://github.com/vernesong/mihomo/releases/download/LightGBM-Model/Model-large.bin"
 
-#节点组锚点
-default:
-  proxies: &pr01 [HKG, JPN, SGP, USA, SMART, HOME, Media Mix, HK-Basic, SG-Basic, Other-Basic, Manual Choice, Download, 直连, 拒绝]
-  type: select
-proxies:
-  - {name: 直连, type: direct}
-  - {name: 拒绝, type: reject}
-proxy-groups:
-  - {name: Test, proxies: *pr01, type: select}
-  - {name: Steam, proxies: *pr01, type: select}
-  - {name: Game, proxies: *pr01, type: select}
-  - {name: YouTube, proxies: *pr01, type: select}
-  - {name: TVB, proxies: *pr01, type: select}
-  - {name: Instagram, proxies: *pr01, type: select}
-  - {name: Telegram, proxies: *pr01, type: select}
-  - {name: Google, proxies: *pr01, type: select}
-  - {name: Emby, proxies: *pr01, type: select}
-  - {name: FavSites, proxies: *pr01, type: select}
-  - {name: Pornhub, proxies: *pr01, type: select}
-  - {name: TikTok, proxies: *pr01, type: select}
-  - {name: ChatGPT, proxies: *pr01, type: select}
-  - {name: GitHub, proxies: *pr01, type: select}
-  - {name: Twitter, proxies: *pr01, type: select}
-  - {name: Facebook, proxies: *pr01, type: select}
-  - {name: Netflix, proxies: *pr01, type: select}
-  - {name: Spotify, proxies: *pr01, type: select}
-  - {name: Apple, proxies: *pr01, type: select}
-  - {name: Microsoft, proxies: *pr01, type: select}
-  - {name: Overseas, proxies: *pr01, type: select}
-  - {name: CHN, proxies: *pr01, type: select}
-  - {name: Others, proxies: *pr01, type: select}
-  - {name: AdsBlock, type: select, proxies: [拒绝, 直连]}
+# icon锚点 #Qure图标集:https://github.com/Koolson/Qure/tree/master/IconSet
+# 功能
+round-robin-icon: &round-robin-icon "https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Round_Robin.png"
+icon-test: &test "https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/Speedtest.png"
+icon-pornhub: &pornhub "https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/Pornhub_1.png"
+icon-tvb: &tvb "https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/TVB.png"
+icon-twitter: &twitter "https://cdn.worldvectorlogo.com/logos/x-2.svg"
+icon-apple: &apple "https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/Apple_1.png"
+icon-icloud: &icloud "https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/iCloud.png"
+icon-appleupdate: &appleupdate "https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Apple_Update.png"
+icon-media-mix: &media-mix "https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/DomesticMedia.png"
+icon-adsblock: &adsblock "https://fastly.jsdelivr.net/gh/shindgew/WHATSINStash/icon/adguard.png"
+icon-spotify: &spotify "https://fastly.jsdelivr.net/gh/chungccc/IconSet@main/spotify-256px.png"
+icon-instagram: &instagram "https://fastly.jsdelivr.net/gh/chungccc/IconSet@main/instagram-256px.png"
+icon-microsoft: &microsoft "https://fastly.jsdelivr.net/gh/chungccc/IconSet@main/window2.png"
+icon-steam: &steam "https://fastly.jsdelivr.net/gh/chungccc/IconSet@main/steam-256px.png"
+icon-telegram: &telegram "https://fastly.jsdelivr.net/gh/chungccc/IconSet@main/telegram-256px.png"
+icon-whatsapp: &whatsapp "https://fastly.jsdelivr.net/gh/chungccc/IconSet@main/whatsapp-256px.png"
+icon-oversea: &oversea "https://fastly.jsdelivr.net/gh/chungccc/IconSet@main/oversea.png"
+icon-exitrun: &exitrun "https://fastly.jsdelivr.net/gh/chungccc/IconSet@main/exitrun.png"
+icon-heart: &heart "https://fastly.jsdelivr.net/gh/chungccc/IconSet@main/heart.png"
+icon-smart: &smartlogo "https://fastly.jsdelivr.net/gh/chungccc/IconSet@main/smart.png"
+icon-netflix: &netflix "https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/Netflix.png"
+icon-youtube: &youtube "https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/YouTube.png"
+icon-github: &github "https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/GitHub.png"
+icon-chatgpt: &chatgpt "https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/ChatGPT.png"
+icon-tiktok: &tiktok "https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/TikTok_1.png"
+icon-google: &google "https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/Google_Search.png"
+icon-emby: &emby "https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/Emby.png"
+icon-imessage: &imessage "https://fastly.jsdelivr.net/gh/chungccc/IconSet/imessage.png"
+icon-bytedance: &bytedance "https://fastly.jsdelivr.net/gh/chungccc/IconSet/bytedance.png"
+# 地区
+icon-other-basic: &other-basic "https://img.icons8.com/?size=100&id=GlN24LRjUhww&format=png&color=000000"
+icon-chn: &chn "https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/China.png"
+icon-hkg: &hkg "https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/Hong_Kong.png"
+icon-kor: &kor "https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/Korea.png"
+icon-sgp: &sgp "https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/Singapore.png"
+icon-jpn: &jpn "https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/Japan.png"
+icon-jpn2: &jpn2 "https://fastly.jsdelivr.net/gh/shindgew/WHATSINStash@main/icon/torii.png"
+icon-twn: &twn "https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/Taiwan.png"
+icon-usa: &usa "https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/United_States.png"
+icon-hkg2: &hkg2 "https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/HK.png"
+icon-jpn3: &jpn3 "https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/JP.png"
+# 其它
+icon-reject: &reject "https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/Reject.png"
+icon-direct: &direct "https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/Direct.png"
+icon-proxy: &proxy "https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/Proxy.png"
+icon-static: &static "https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/Static.png"
+icon-available: &available "https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/Available.png"
+icon-china-telecom: &china-telecom "https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Dark/China_Telecom.png"
 
-  # ALLsmart  所有优质机场PRM节点集合
-  - {name: SMART, type: smart, filter: ".*PRM.*", uselightgbm: true, collectdata: false, include-all: true, policy-priority: "Max:0.5;TOP:0.5;", prefer-asn: true}
-  # 香港地区 PRM优质节点
-  - {name: HKG, type: smart, filter: "(?=.*(香港|HK|Hong Kong|HKG))(?=.*PRM).*", uselightgbm: true, collectdata: false, include-all: true, policy-priority: "Max:0.5;TOP:0.3;PRO:0.3;", prefer-asn: true}
-  # HOME
-  - {name: HOME, type: smart, filter: "(?=.*(HOME|家宽|家庭|住宅)).*", uselightgbm: true, collectdata: false, include-all: true}
-  # 新加坡地区  PRM优质节点
-  - {name: SGP, type: smart, filter: '^(?=.*(新加坡|SG|Singapore|SGP))(?=.*PRM).*$', uselightgbm: true, collectdata: false, include-all: true, policy-priority: "Max:0.5;TOP:0.3;", prefer-asn: true}
-  # 日本地区  PRM优质节点
-  - {name: JPN, type: smart, filter: '^(?=.*(日本|东京|JP|Japan|JPN))(?=.*PRM).*$', uselightgbm: true, collectdata: false, include-all: true, policy-priority: "Max:0.5;TOP:0.3;", prefer-asn: true}
-  # 美国地区  PRM优质节点
-  - {name: USA, type: smart, filter: '^(?=.*(美国|纽约|洛杉矶|US|USA|United States|America))(?=.*PRM).*$', uselightgbm: true, collectdata: false, include-all: true, policy-priority: "Max:0.5;TOP:0.3;", prefer-asn: true}
-  # 新加坡香港和其他地区BSC节点组
-  - {name: HK-Basic, type: smart, uselightgbm: true, collectdata: false, include-all: true, filter: "(?=.*(香港|HK|Hong Kong|HKG))(?=.*BSC).*", prefer-asn: true}
-  - {name: SG-Basic, type: smart, uselightgbm: true, collectdata: false, include-all: true, filter: "(?=.*(新加坡|SG|Singapore|SGP))(?=.*BSC).*",  prefer-asn: true}
-  # 排除了香港和新加坡的其他基本节点
-  - {name: Other-Basic, type: smart, uselightgbm: true, collectdata: false, include-all: true, filter: "(?!.*(香港|HK|Hong Kong|新加坡|SG|Singapore))(?=.*BSC).*", prefer-asn: true}
-  # 手动选择
-  - {name: Manual Choice, type: select, filter: ^((?!(拒绝|直连)).)*$, include-all: true}
-  #低倍率
-  - {name: Download, type: smart, uselightgbm: true, collectdata: false, include-all: true, filter: "(?i)(下载|0\\.1|0\\.01X|BT|DL)", prefer-asn: true}
+
+default:
+  #策略组锚点
+  proxies: &default [HKG, JPN, SGP, SMART, HK-Basic, SG-Basic, JP-Basic, Manual Choice, Media HKG, Media JPN, 直连, 拒绝]
+  type: select
+
+# 功能组
+proxies: [{name: 直连, type: direct, icon: *direct}, {name: 拒绝, type: reject, icon: *reject}]
+proxy-groups:
+  - {name: Instagram, proxies: *default, type: select, icon: *instagram}
+  - {name: Telegram, proxies: *default, type: select, icon: *telegram}
+  - {name: WhatsApp, proxies: *default, type: select, icon: *whatsapp}
+  - {name: Google, proxies: *default, type: select, icon: *google}
+  - {name: Emby, proxies: *default, type: select, icon: *emby}
+  - {name: FavSites, proxies: *default, type: select, icon: *heart}
+  - {name: Notification, proxies: *default, type: select, icon: *imessage}
+  - {name: Pornhub, proxies: *default, type: select, icon: *pornhub}
+  - {name: TikTok, proxies: *default, type: select, icon: *tiktok}
+  - {name: ByteDance, proxies: *default, type: select, icon: *bytedance}
+  - {name: ChatGPT, proxies: *default, type: select, icon: *chatgpt}
+  - {name: GitHub, proxies: *default, type: select, icon: *github}
+  - {name: Twitter, proxies: *default, type: select, icon: *twitter}
+  - {name: Test, proxies: *default, type: select, icon: *test}
+  - {name: Steam, proxies: *default, type: select, icon: *steam}
+  - {name: YouTube, proxies: *default, type: select, icon: *youtube}
+  - {name: TVB, proxies: *default, type: select, icon: *tvb}
+  - {name: Netflix, proxies: *default, type: select, icon: *netflix}
+  - {name: Spotify, proxies: *default, type: select, icon: *spotify}
+  - {name: Apple, proxies: *default, type: select, icon: *apple}
+  - {name: iCloud, proxies: *default, type: select, icon: *icloud}
+  - {name: AppleUpdate, proxies: *default, type: select, icon: *appleupdate}
+  - {name: Microsoft, proxies: *default, type: select, icon: *microsoft}
+  - {name: Overseas, proxies: *default, type: select, icon: *oversea}
+  - {name: CHN, proxies: *default, type: select, icon: *chn}
+  - {name: Others, proxies: *default, type: select, icon: *exitrun}
+  - {name: AdsBlock, type: select, proxies: *default, icon: *adsblock}
+#地区组
+  # ONEsmart
+  - {name: SMART, <<: *smart, filter: "^(?=.*(PRM|SUF|POR))(?=.*(HKG|SGP|JPN|USA))(?!.*TOP).*$", policy-priority: "Max:0.8;TOP:0.3;", icon: *smartlogo}
+  # 香港地区
+  - {name: HKG, <<: *smart, filter: "(?=.*(香港|HK|Hong Kong|HKG))(?=.*PRM).*", policy-priority: "TOP:0.3;INT:1.1;", icon: *hkg}
+  # 新加坡地区
+  - {name: SGP, <<: *smart, filter: "^(?=.*(新加坡|SG|Singapore|SGP))(?=.*PRM).*$", policy-priority: "TOP:0.3;INT:1.3;", icon: *sgp}
+  # 日本地区
+  - {name: JPN, <<: *smart, filter: "^(?=.*(日本|东京|JP|Japan|JPN))(?=.*PRM).*$", policy-priority: "TOP:0.3;INT:1.3;", icon: *jpn}
+  # 新加坡香港BSC混合节点组
+  - {name: HK-Basic, <<: *smart, filter: "(?=.*(香港|HK|Hong Kong|HKG))(?=.*BSC).*", icon: *hkg}
+  - {name: SG-Basic, <<: *smart, filter: "(?=.*(新加坡|SG|Singapore|SGP))(?=.*BSC).*", icon: *sgp}
+  - {name: JP-Basic, <<: *smart, filter: "(?=.*(JPN|日本))(?=.*BSC).*", icon: *jpn}
+  - {name: CT, <<: *smart, filter: "(?=.*(SGP|HKG|TWN|KOR))(?=.*BSC)(?=.*CT).*", tolerance: 80, icon: *china-telecom}
+  # YouTube节点
+  - {name: Media HKG, <<: *smart, filter: "(?=.*(香港|HKG))(?=.*(ASH|BSC|PRO|MDA|SUF))(?!.*(Max|MAX|Top|TOP)).*", icon: *hkg2}
+  - {name: Media JPN, <<: *smart, filter: "(?=.*(JPN|日本))(?=.*(ASH|BSC|PRO|MDA|SUF))(?!.*(Max|MAX|Top|TOP)).*", icon: *jpn3}
+  # 其他
+  - {name: Manual Choice, type: select, filter: "^((?!(拒绝|直连|Bypass|Block)).)*$", include-all: true, icon: *static}
 
 
 redir-port: 7892
@@ -214,9 +271,6 @@ rule-providers:
   Blizzard-Domain: {behavior: classical, format: text, interval: 86400, type: http, url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Blizzard/Blizzard.list}
   ChatGPT-Domain: {behavior: domain, format: mrs, interval: 86400, type: http, url: https://github.com/MetaCubeX/meta-rules-dat/raw/refs/heads/meta/geo/geosite/openai.mrs}
   IMDb-Domain: {behavior: domain, format: mrs, interval: 86400, type: http, url: https://github.com/MetaCubeX/meta-rules-dat/raw/refs/heads/meta/geo/geosite/imdb.mrs}
-  China-Domain: {behavior: domain, format: mrs, interval: 86400, type: http, url: https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/cn.mrs}
-  China-IP: {behavior: ipcidr, format: mrs, interval: 86400, type: http, url: https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geoip/cn.mrs}
-  Direct-Domain: {behavior: classical, format: text, interval: 86400, type: http, url: https://raw.githubusercontent.com/liandu2024/clash/refs/heads/main/list/Direct.list}
   EA-Domain: {behavior: classical, format: text, interval: 86400, type: http, url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/EA/EA.list}
   Epic-Domain: {behavior: classical, format: text, interval: 86400, type: http, url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Epic/Epic.list}
   Facebook-Domain: {behavior: domain, format: mrs, interval: 86400, type: http, url: https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/facebook.mrs}
@@ -228,7 +282,6 @@ rule-providers:
   Netflix-Domain: {behavior: domain, format: mrs, interval: 86400, type: http, url: https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/netflix.mrs}
   Netflix-IP: {behavior: ipcidr, format: mrs, interval: 86400, type: http, url: https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geoip/netflix.mrs}
   Nintend-Domain: {behavior: classical, format: text, interval: 86400, type: http, url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Nintendo/Nintendo.list}
-  Private-Domain: {behavior: domain, format: mrs, interval: 86400, type: http, url: https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/private.mrs}
   Proxy-Domain: {behavior: classical, format: text, interval: 86400, type: http, url: https://raw.githubusercontent.com/liandu2024/clash/refs/heads/main/list/Proxy.list}
   Sony-Domain: {behavior: classical, format: text, interval: 86400, type: http, url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Sony/Sony.list}
   Spotify-Domain: {behavior: domain, format: mrs, interval: 86400, type: http, url: https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/spotify.mrs}
@@ -287,11 +340,9 @@ rules:
 - RULE-SET,TEST-Domain,Test
 - RULE-SET,Proxy-Domain,Overseas
 - RULE-SET,Globe-Domain,Overseas
-- RULE-SET,Direct-Domain,CHN
-- RULE-SET,China-Domain,CHN
-- RULE-SET,China-IP,CHN,no-resolve
-- RULE-SET,Private-Domain,CHN
 - IP-ASN,32934,Instagram
+- GEOSITE,cn,CHN
+- GEOIP,CN,CHN,no-resolve
 - MATCH,Others 
 secret: '123456'
 socks-port: 7891
