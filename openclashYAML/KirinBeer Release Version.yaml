@@ -1,0 +1,464 @@
+#更新日期：2026年11月16日
+
+#订阅健康检查锚点
+health-check: &hc {enable: true, url: https://cp.cloudflare.com/generate_204, lazy: true, interval: 600, timeout: 3000}
+#url-test策略锚点
+urltest: &urltest {type: url-test, include-all: true, url: "https://cp.cloudflare.com/generate_204", interval: 300, tolerance: 20, lazy: true}
+# SMART策略 公共参数锚点
+smart: &smart {type: smart, uselightgbm: true, collectdata: false, include-all: true, prefer-asn: true, tolerance: 50}
+
+proxy-providers:
+  LXY-RLY: #链式代理出口的机场订阅
+    health-check: *hc
+    interval: 30000
+    path: ./providers/LXY2LXY-RLY.yaml
+    type: http
+    url: 
+    filter: '(香港|新加坡|韩国|台湾|日本|英国)'
+    override:
+      dialer-proxy: RLY-ENTER #链式代理入口策略组
+      additional-prefix: "LXY-"
+      additional-suffix: "-RLY"
+      proxy-name:
+      - {pattern: "香港", target: "HKG-"}
+      - {pattern: "新加坡", target: "SGP-"}
+      - {pattern: "英国伦敦", target: "GBR-"}
+      - {pattern: "日本", target: "JPN-"}
+      - {pattern: "台湾", target: "TWN-"}
+      - {pattern: "韩国", target: "KOR-"}
+      - {pattern: "美国", target: "USA-"}
+      - {pattern: "\\|BGP", target: ""}
+      - {pattern: "\\|流媒体", target: ""}
+      - {pattern: "住宅IP", target: "R"}
+      - {pattern: "专线", target: "A-"}
+      - {pattern: "🇨🇳", target: "🇹🇼"} # 旗帜
+      - {pattern: "倍", target: ""}
+      - {pattern: "\\|", target: "-"}
+      - {pattern: "0.5x", target: "0.5X"}
+      - {pattern: "CTCMCU", target: "CT"}
+      - {pattern: "CTCUCM", target: "CT"}
+      - {pattern: "CMCU", target: "D"}
+      - {pattern: "CTCU", target: "CT"}
+      - {pattern: "CUCM", target: "D"}
+      - {pattern: "高速", target: "B-"}
+      - {pattern: "洛杉矶", target: "LA-"}
+      - {pattern: "--", target: "-"}
+      override-expr:
+      - '.name = "\(.name)-\(.type)"'
+  订阅A:
+    health-check: *hc
+    interval: 3000
+    path: ./providers/专线.yaml
+    type: http
+    url: 
+    filter: '(香港|日本|新加坡|美国|韩国|台湾|家宽|原生)'
+    #filter: '^(?!.*(流量|到期|套餐|官网|刷新|订阅|更新|失联|邮箱|IPV6|官方)).*$'
+    override:
+      additional-prefix: "PRO-"
+      additional-suffix: "-BSC"
+      proxy-name:
+      - {pattern: "香港", target: "HKG-"}
+      - {pattern: "韩国", target: "KOR"}
+      - {pattern: "马来西亚", target: "MYS"}
+      - {pattern: "泰国", target: "THA"}
+      - {pattern: "首尔", target: "Soul"}
+      - {pattern: "新加坡", target: "SGP-"}
+      - {pattern: "日本", target: "JPN-"}
+      - {pattern: "台湾", target: "TWN-"}
+      - {pattern: "加拿大", target: "CAN-"}
+      - {pattern: "英国", target: "GBR-"}
+      - {pattern: "美国", target: "USA-"}
+      - {pattern: "原生", target: "-Native"}
+      - {pattern: "家宽", target: "Resi"}
+      - {pattern: "联通", target: "CU"}
+      - {pattern: "移动", target: "CM-"}
+      - {pattern: "电信", target: "CT"}
+      - {pattern: "中转", target: "Relay"}
+      - {pattern: "负载", target: "LD-"}
+      - {pattern: "荷兰", target: "NLD"}
+      - {pattern: "🇨🇳", target: "🇹🇼"} # 旗帜
+      - {pattern: "0.5倍率", target: "X0.5"}
+      - {pattern: "直连", target: "DIR-"}
+      - {pattern: "BT下载专用", target: "BTDL"}
+      - {pattern: "--", target: "-"}
+
+  订阅B:
+    health-check: *hc
+    interval: 3000
+    path: ./providers/LCB.yaml
+    type: http
+    url:
+    filter: '(狮城|台湾|香港|日本|美国)'
+    override:
+      additional-prefix: "LCB-"
+      additional-suffix: "-PRM"
+      proxy-name:
+      - {pattern: "香港", target: "-"}
+      - {pattern: "狮城", target: "-"}
+      - {pattern: "日本", target: "-"}
+      - {pattern: "台湾", target: "-"}
+      - {pattern: "美国", target: "-"}
+      - {pattern: "韩国", target: "-"}
+      - {pattern: " ", target: ""}
+  
+  订阅C:
+    health-check: *hc
+    interval: 3000
+    path: ./providers/LXY2.yaml
+    type: http
+    url: 
+    filter: '(香港|新加坡|韩国|台湾|日本|美国)'
+    override:
+      additional-prefix: "LXY-"
+      additional-suffix: "-BSC"
+      proxy-name:
+      - {pattern: "香港", target: "HKG-"}
+      - {pattern: "新加坡", target: "SGP-"}
+      - {pattern: "英国伦敦", target: "GBR-"}
+      - {pattern: "日本", target: "JPN-"}
+      - {pattern: "台湾", target: "TWN-"}
+      - {pattern: "韩国", target: "KOR-"}
+      - {pattern: "美国", target: "USA-"}
+      - {pattern: "\\|BGP", target: ""}
+      - {pattern: "\\|流媒体", target: ""}
+      - {pattern: "住宅IP", target: "R"}
+      - {pattern: "专线", target: "A-"}
+      - {pattern: "🇨🇳", target: "🇹🇼"} # 旗帜
+      - {pattern: "倍", target: ""}
+      - {pattern: "\\|", target: "-"}
+      - {pattern: "0.5x", target: "0.5X"}
+      - {pattern: "CTCMCU", target: "CT"}
+      - {pattern: "CTCUCM", target: "CT"}
+      - {pattern: "CMCU", target: "D"}
+      - {pattern: "CTCU", target: "CT"}
+      - {pattern: "CUCM", target: "D"}
+      - {pattern: "高速", target: "B-"}
+      - {pattern: "洛杉矶", target: "LA-"}
+      - {pattern: "--", target: "-"}
+      override-expr:
+      - '.name = "\(.name)-\(.type)"'
+       
+allow-lan: true
+# P2P下载端口
+listeners:
+- name: socks5-in-1
+  type: socks
+  port: 10808
+  listen: 0.0.0.0
+  udp: true
+  users: []
+  proxy: DIRECT
+
+#DNS模块
+dns:
+  enable: true
+  #  基础模式 
+  enhanced-mode: fake-ip
+  fake-ip-range: 198.20.0.1/16
+  ipv6: true
+  listen: 0.0.0.0:7874
+  fake-ip-filter:  #  fake-ip 例外（不走 fake-ip，直连真实 IP）
+    - +.lan
+    - +.local
+    - geosite:cn
+  nameserver:  #  默认 DNS（国内优先，只放国内）
+    - 202.96.134.33
+    - 202.96.128.86
+    - 223.5.5.5           # 阿里 DNS
+    - 119.29.29.29        # 腾讯 DNSPod
+    - 1.12.12.12          # 腾讯安全 DNS
+  default-nameserver:
+    - 223.5.5.5
+    - 119.29.29.29
+  nameserver-policy:  #  规则指定 DNS（与官方示例一致）
+    '+.arpa': 192.168.2.1
+    'geosite:cn':
+      - 223.5.5.5
+      - 119.29.29.29
+  proxy-server-nameserver:  #代理服务器自身域名解析 机场节点用
+    - 'https://doh.pub/dns-query'
+    - 223.5.5.5
+  fallback:  #Overseas / 被污染域名兜底 DNS
+    - tls://1.1.1.1:853
+    - tls://8.8.8.8:853
+    - tls://9.9.9.9:853
+  fallback-filter:  #什么时候才启用 fallback
+    geoip: true
+    geoip-code: CN
+    geosite:
+      - gfw
+    domain:
+      - '+.google.com'
+      - '+.facebook.com'
+      - '+.youtube.com'
+
+#面板指控
+external-controller: 0.0.0.0:9090
+external-ui: ui
+external-ui-name: zashboard
+external-ui-url: https://github.com/Zephyruso/zashboard/archive/refs/heads/gh-pages.zip
+ipv6: true
+log-level: info
+mixed-port: 7893
+mode: rule
+port: 7890
+profile:
+  store-fake-ip: true
+  store-selected: true
+unified-delay: true # 统一延迟 计算RTT 可选值 true/false
+lgbm-auto-update: true #smart模型更新
+lgbm-update-interval: 48
+lgbm-url: "https://github.com/vernesong/mihomo/releases/download/LightGBM-Model/Model-large.bin"
+
+# icon锚点 #Qure图标集:https://github.com/Koolson/Qure/tree/master/IconSet
+# 功能
+round-robin-icon: &round-robin-icon "https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Round_Robin.png"
+icon-test: &test "https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/Speedtest.png"
+icon-pornhub: &pornhub "https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/Pornhub_1.png"
+icon-18: &18 "https://fastly.jsdelivr.net/gh/chungccc/IconSet/18b.png"
+icon-tvb: &tvb "https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/TVB.png"
+icon-twitter: &twitter "https://cdn.worldvectorlogo.com/logos/x-2.svg"
+icon-apple: &apple "https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/Apple_1.png"
+icon-icloud: &icloud "https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/iCloud.png"
+icon-appleupdate: &appleupdate "https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Apple_Update.png"
+icon-media-mix: &media-mix "https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/DomesticMedia.png"
+icon-adsblock: &adsblock "https://fastly.jsdelivr.net/gh/shindgew/WHATSINStash/icon/adguard.png"
+icon-spotify: &spotify "https://fastly.jsdelivr.net/gh/chungccc/IconSet@main/spotify-256px.png"
+icon-instagram: &instagram "https://fastly.jsdelivr.net/gh/chungccc/IconSet@main/instagram-256px.png"
+icon-microsoft: &microsoft "https://fastly.jsdelivr.net/gh/chungccc/IconSet@main/window2.png"
+icon-steam: &steam "https://fastly.jsdelivr.net/gh/chungccc/IconSet@main/steam-256px.png"
+icon-telegram: &telegram "https://fastly.jsdelivr.net/gh/chungccc/IconSet@main/telegram-256px.png"
+icon-whatsapp: &whatsapp "https://fastly.jsdelivr.net/gh/chungccc/IconSet@main/whatsapp-256px.png"
+icon-oversea: &oversea "https://fastly.jsdelivr.net/gh/chungccc/IconSet@main/oversea.png"
+icon-exitrun: &exitrun "https://fastly.jsdelivr.net/gh/chungccc/IconSet@main/exitrun.png"
+icon-heart: &heart "https://fastly.jsdelivr.net/gh/chungccc/IconSet@main/heart.png"
+icon-smart: &smartlogo "https://fastly.jsdelivr.net/gh/chungccc/IconSet@main/smart.png"
+icon-smart2: &smartlogo2 "https://fastly.jsdelivr.net/gh/chungccc/IconSet@main/smart2.png"
+icon-netflix: &netflix "https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/Netflix.png"
+icon-youtube: &youtube "https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/YouTube.png"
+icon-github: &github "https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/GitHub.png"
+icon-chatgpt: &chatgpt "https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/ChatGPT.png"
+icon-tiktok: &tiktok "https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/TikTok_1.png"
+icon-google: &google "https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/Google_Search.png"
+icon-emby: &emby "https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/Emby.png"
+icon-imessage: &imessage "https://fastly.jsdelivr.net/gh/chungccc/IconSet/imessage.png"
+icon-bytedance: &bytedance "https://fastly.jsdelivr.net/gh/chungccc/IconSet/bytedance.png"
+icon-homeadvisor: &residential "https://fastly.jsdelivr.net/gh/chungccc/IconSet/homeadvisor.png"
+
+# 地区
+icon-other-basic: &other-basic "https://img.icons8.com/?size=100&id=GlN24LRjUhww&format=png&color=000000"
+icon-chn: &chn "https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/China.png"
+icon-hkg: &hkg "https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/Hong_Kong.png"
+icon-kor: &kor "https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/Korea.png"
+icon-sgp: &sgp "https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/Singapore.png"
+icon-jpn: &jpn "https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/Japan.png"
+icon-jpn2: &jpn2 "https://fastly.jsdelivr.net/gh/shindgew/WHATSINStash@main/icon/torii.png"
+icon-twn: &twn "https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/Taiwan.png"
+icon-usa: &usa "https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/United_States.png"
+icon-hkg2: &hkg2 "https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/HK.png"
+icon-jpn3: &jpn3 "https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/JP.png"
+# 其它
+icon-reject: &reject "https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/Reject.png"
+icon-direct: &direct "https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/Direct.png"
+icon-proxy: &proxy "https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/Proxy.png"
+icon-static: &static "https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/Static.png"
+icon-available: &available "https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/Available.png"
+icon-china-telecom: &china-telecom "https://fastly.jsdelivr.net/gh/chungccc/IconSet@main/ct.png"
+icon-inlogo: &in "https://fastly.jsdelivr.net/gh/chungccc/IconSet@main/in.png"
+icon-outlogo: &out "https://fastly.jsdelivr.net/gh/chungccc/IconSet@main/out.png"
+icon-relaylogo: &relay "https://fastly.jsdelivr.net/gh/chungccc/IconSet@main/relay2.png"
+icon-download: &download "https://fastly.jsdelivr.net/gh/chungccc/IconSet@main/download.png"
+
+default:
+  # 策略组锚点
+  proxies: &default [HKG, JPN, SGP, SMART, Residential, HK-Basic, SG-Basic, JP-Basic, Manual Choice, Download, SMART-BSC, Bypass, Block]
+  type: select
+
+second:
+  proxies: &embyg [SG-Basic, HK-Basic, Manual Choice, MIX-RLY, HKG-RLY, SGP-RLY, JPN-RLY]
+  type: select
+
+third:
+  proxies: &youtubeg [Media HKG, Media JPN, HKG, JPN, HK-Basic, JP-Basic,  MIX-RLY, HKG-RLY, SGP-RLY, JPN-RLY, Manual Choice]
+  type: select
+# 功能组
+proxies: [{name: 直连, type: direct, icon: *direct}, {name: 拒绝, type: reject, icon: *reject}]
+proxy-groups:
+  - {name: Instagram, proxies: *default, type: select, icon: *instagram}
+  - {name: Telegram, proxies: *default, type: select, icon: *telegram}
+  - {name: WhatsApp, proxies: *default, type: select, icon: *whatsapp}
+  - {name: Google, proxies: *default, type: select, icon: *google}
+  - {name: Emby, proxies: *embyg, type: select, icon: *emby}
+  - {name: FavSites, proxies: *default, type: select, icon: *heart}
+  - {name: Notification, proxies: *default, type: select, icon: *imessage}
+  - {name: 18+, proxies: *youtubeg, type: select, icon: *18}
+  - {name: TikTok, proxies: *default, type: select, icon: *tiktok}
+  - {name: ChatGPT, proxies: *default, type: select, icon: *chatgpt}
+  - {name: GitHub, proxies: *default, type: select, icon: *github}
+  - {name: Twitter, proxies: *youtubeg, type: select, icon: *twitter}
+  - {name: Test, proxies: *default, type: select, icon: *test}
+  - {name: Steam, proxies: *default, type: select, icon: *steam}
+  - {name: YouTube, proxies: *youtubeg, type: select, icon: *youtube}
+  - {name: TVB, proxies: *default, type: select, icon: *tvb}
+  - {name: Netflix, proxies: *default, type: select, icon: *netflix}
+  - {name: Spotify, proxies: *default, type: select, icon: *spotify}
+  - {name: Apple, proxies: *default, type: select, icon: *apple}
+  - {name: iCloud, proxies: *default, type: select, icon: *icloud}
+  - {name: AppleUpdate, proxies: *default, type: select, icon: *appleupdate}
+  - {name: Microsoft, proxies: *default, type: select, icon: *microsoft}
+  - {name: Overseas, proxies: *default, type: select, icon: *oversea}
+  - {name: CHN, proxies: *default, type: select, icon: *chn}
+  - {name: Others, proxies: *default, type: select, icon: *exitrun}
+  - {name: AdsBlock, type: select, proxies: *default, icon: *adsblock}
+#地区组
+  # ONEsmart
+  - {name: SMART, <<: *smart, filter: "^(?=.*PRM)(?=.*(HKG|SGP|JPN|USA))(?!.*TOP).*$", policy-priority: "Max:0.7;TOP:0.3;ASH:0.7;INT:1.2;", icon: *smartlogo}
+  - {name: SMART-BSC, <<: *smart, filter: "^(?=.*BSC)(?=.*(HKG|SGP|JPN|USA))(?!.*TOP).*$", icon: *smartlogo2}
+  - {name: Residential, <<: *smart, filter: "^(?=.*(Resi|Native))(?=.*(HKG|SGP|JPN|USA|TWN)).*$", policy-priority: "Max:0.9;TOP:0.3;BSC:0.9;", icon: *residential}
+  # 香港地区
+  - {name: HKG, <<: *smart, filter: "^(?=.*(香港|HK|Hong Kong|HKG))(?=.*PRM).*$", policy-priority: "Max:0.7;TOP:0.7;", icon: *hkg}
+  # 新加坡地区
+  - {name: SGP, <<: *smart, filter: "^(?=.*(新加坡|SG|Singapore|SGP))(?=.*PRM).*$", policy-priority: "Max:0.7;TOP:0.3;BSC:0.9;", icon: *sgp}
+  # 日本地区
+  - {name: JPN, <<: *smart, filter: "^(?=.*(日本|东京|JP|Japan|JPN))(?=.*PRM).*$", policy-priority: "Max:0.7;TOP:0.3;BSC:0.9;", icon: *jpn}
+  #- {name: JPN TOP, <<: *smart, filter: "^(?=.*(日本|东京|JP|Japan|JPN))(?=.*(TOP|Max|3X|Resi|2.5X|2X)).*$", icon: *jpn2}
+  # 台湾地区
+  #- {name: TWN, <<: *smart, filter: "^(?=.*(台湾|台灣|TW|Taiwan|TWN))(?=.*(BSC|PRM)).*$", policy-priority: "Max:0.7;TOP:0.3;BSC:0.9;ASH:1.1;INT:1.2;", icon: *twn}
+  # 美国地区
+  #- {name: USA, <<: *smart, filter: "^(?=.*(美国|美國|US|USA|United States))(?=.*(BSC|PRM)).*$", policy-priority: "Max:0.7;TOP:0.3;BSC:0.9;ASH:1.1;INT:1.2;", icon: *usa}
+  # 新加坡香港BSC混合节点组
+  - {name: HK-Basic, <<: *smart, filter: "(?=.*(香港|HK|Hong Kong|HKG))(?=.*BSC).*", policy-priority: "PRO:1.3;vless:1.1", icon: *hkg}
+  - {name: SG-Basic, <<: *smart, filter: "(?=.*(新加坡|SG|Singapore|SGP))(?=.*BSC).*", policy-priority: "PRO:1.3;vless:1.1", icon: *sgp}
+  - {name: JP-Basic, <<: *smart, filter: "(?=.*(JPN|日本))(?=.*BSC).*", policy-priority: "PRO:1.3;vless:1.1", icon: *jpn}
+  #链式代理
+  - {name: RLY-ENTER, <<: *smart, filter: "(?=.*(美国|US|USA|United States))(?=.*BSC).*", icon: *usa} #美国入口
+  - {name: MIX-RLY, type: select, use: [LXY-RLY], filter: "^(?!.*(美国|US|USA|United States|日本|JP|JPN|Japan))(?=.*RLY).*$", icon: *relay} #香港、新加坡BSC混合出口（手选）
+  - {name: HKG-RLY, type: select, use: [LXY-RLY], filter: "HKG", icon: *hkg} #香港出口
+  - {name: SGP-RLY, type: select, use: [LXY-RLY], filter: "SGP", icon: *sgp} #新加坡出口
+  - {name: JPN-RLY, type: select, use: [LXY-RLY], filter: "JPN", icon: *jpn} #日本出口
+  # YouTube媒体节点
+  - {name: Media HKG, <<: *smart, filter: "(?=.*(香港|HKG))(?=.*(ASH|BSC|PRO|MDA|SUF))(?!.*(Max|MAX|Top|TOP)).*", icon: *hkg2}
+  - {name: Media JPN, <<: *smart, filter: "(?=.*(JPN|日本))(?=.*(ASH|BSC|PRO|MDA|SUF))(?!.*(Max|MAX|Top|TOP)).*", icon: *jpn3}
+  - {name: Manual Choice, type: select, filter: "^((?!(拒绝|直连|Bypass|Block|HKG|JPN|SGP)).)*$", include-all: true, icon: *static}
+  - {name: Bypass, type: select, proxies: [直连], icon: *direct}
+  - {name: Block, type: select, proxies: [拒绝], icon: *reject}
+  # 下载策略组
+  - {name: Download, <<: *smart, filter: "(?=.*(DL|BT)).*", icon: *download}
+
+redir-port: 7892
+rule-anchor:
+  class: {behavior: classical, format: text, interval: 86400, type: http}
+  domain: {behavior: domain, format: mrs, interval: 86400, type: http}
+  ip: {behavior: ipcidr, format: mrs, interval: 86400, type: http}
+
+rule-providers:
+  AWAvenue: {type: http, behavior: domain, format: yaml, path: ./rule_providers/AWAvenue-Ads-Rule-Clash.yaml, url: "https://raw.githubusercontent.com/TG-Twilight/AWAvenue-Ads-Rule/main//Filters/AWAvenue-Ads-Rule-Clash.yaml", interval: 86400}
+  anti-ad: {type: http, behavior: domain, path: ./ruleset/anti-ad.yaml, url: "https://raw.githubusercontent.com/privacy-protection-tools/anti-AD/master/anti-ad-clash.yaml", interval: 86400}
+  Instagram-Domain: {behavior: domain, format: mrs, interval: 86400, type: http, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/refs/heads/meta/geo/geosite/instagram.mrs"}
+  AI-Domain: {behavior: domain, format: mrs, interval: 86400, type: http, url: "https://github.com/MetaCubeX/meta-rules-dat/raw/refs/heads/meta/geo/geosite/category-ai-!cn.mrs"}
+  Apple-Domain: {behavior: domain, format: mrs, interval: 86400, type: http, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/apple.mrs"}
+  Apple-CN-Domain: {behavior: domain, format: mrs, interval: 86400, type: http, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/apple-cn.mrs"}
+  Blizzard-Domain: {behavior: classical, format: text, interval: 86400, type: http, url: "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Blizzard/Blizzard.list"}
+  ChatGPT-Domain: {behavior: domain, format: mrs, interval: 86400, type: http, url: "https://github.com/MetaCubeX/meta-rules-dat/raw/refs/heads/meta/geo/geosite/openai.mrs"}
+  IMDb-Domain: {behavior: domain, format: mrs, interval: 86400, type: http, url: "https://github.com/MetaCubeX/meta-rules-dat/raw/refs/heads/meta/geo/geosite/imdb.mrs"}
+  EA-Domain: {behavior: classical, format: text, interval: 86400, type: http, url: "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/EA/EA.list"}
+  Epic-Domain: {behavior: classical, format: text, interval: 86400, type: http, url: "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Epic/Epic.list"}
+  Facebook-Domain: {behavior: domain, format: mrs, interval: 86400, type: http, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/facebook.mrs"}
+  Github-Domain: {behavior: domain, format: mrs, interval: 86400, type: http, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/github.mrs"}
+  Globe-Domain: {behavior: classical, format: text, interval: 86400, type: http, url: "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/refs/heads/master/rule/Clash/Global/Global.list"}
+  Google-Domain: {behavior: domain, format: mrs, interval: 86400, type: http, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/google.mrs"}
+  Google-IP: {behavior: ipcidr, format: mrs, interval: 86400, type: http, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geoip/google.mrs"}
+  Microsoft-Domain: {behavior: domain, format: mrs, interval: 86400, type: http, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/microsoft.mrs"}
+  Netflix-Domain: {behavior: domain, format: mrs, interval: 86400, type: http, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/netflix.mrs"}
+  Netflix-IP: {behavior: ipcidr, format: mrs, interval: 86400, type: http, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geoip/netflix.mrs"}
+  Nintend-Domain: {behavior: classical, format: text, interval: 86400, type: http, url: "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Nintendo/Nintendo.list"}
+  Proxy-Domain: {behavior: classical, format: text, interval: 86400, type: http, url: "https://raw.githubusercontent.com/liandu2024/clash/refs/heads/main/list/Proxy.list"}
+  Sony-Domain: {behavior: classical, format: text, interval: 86400, type: http, url: "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Sony/Sony.list"}
+  Spotify-Domain: {behavior: domain, format: mrs, interval: 86400, type: http, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/spotify.mrs"}
+  Steam-Domain: {behavior: domain, format: mrs, interval: 86400, type: http, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/steam.mrs"}
+  TEST-Domain: {behavior: classical, format: text, interval: 86400, type: http, url: "https://raw.githubusercontent.com/liandu2024/clash/refs/heads/main/list/Check.list"}
+  Telegram-Domain: {behavior: domain, format: mrs, interval: 86400, type: http, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/telegram.mrs"}
+  Telegram-IP: {behavior: ipcidr, format: mrs, interval: 86400, type: http, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geoip/telegram.mrs"}
+  TikTok-Domain: {behavior: domain, format: mrs, interval: 86400, type: http, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/tiktok.mrs"}
+  UBI-Domain: {behavior: classical, format: text, interval: 86400, type: http, url: "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/UBI/UBI.list"}
+  Youtube-Domain: {behavior: domain, format: mrs, interval: 86400, type: http, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/youtube.mrs"}
+  Emby-Domain: {behavior: classical, format: yaml, interval: 86400, type: http, path: ./rule_provider/Emby.yaml, url: "https://raw.githubusercontent.com/chungccc/Ruleset/refs/heads/main/Emby.yaml"}
+  IPTest-Domain: {behavior: classical, format: yaml, interval: 86400, type: http, path: ./rule_provider/IPTest.yaml, url: "https://raw.githubusercontent.com/chungccc/Ruleset/refs/heads/main/IPTest.yaml"}
+  Directmod-Domain: {behavior: classical, format: yaml, interval: 86400, type: http, path: ./rule_provider/Directmod.yaml, url: "https://raw.githubusercontent.com/chungccc/Ruleset/refs/heads/main/Directmod.yaml"}
+  FavSites-Domain: {behavior: classical, format: yaml, interval: 86400, type: http, path: ./rule_provider/FavSites.yaml, url: "https://raw.githubusercontent.com/chungccc/Ruleset/refs/heads/main/FavSites.yaml"}
+  AD-Filter: {behavior: domain, format: mrs, interval: 86400, type: http, url: "https://gcore.jsdelivr.net/gh/217heidai/adblockfilters@main/rules/adblockmihomolite.mrs"}
+
+rules:
+  - RULE-SET,AD-Filter,AdsBlock # 广告拦截
+  - RULE-SET,AWAvenue,AdsBlock # 广告拦截
+  #- RULE-SET,anti-ad,AdsBlock # 广告拦截
+  - DOMAIN-SUFFIX,push.apple.com,Notification #apple通知推送
+  - DOMAIN-SUFFIX,adobe.io,REJECT # Adobe检测拦截
+  - RULE-SET,Directmod-Domain,CHN   # 直连网站
+  #- GEOSITE,douyin,ByteDance
+  - RULE-SET,Emby-Domain,Emby # # Emby
+  - GEOSITE,mytvsuper,TVB # TVB
+  - RULE-SET,IPTest-Domain,Test # IP检测
+  - RULE-SET,Instagram-Domain,Instagram
+  - GEOSITE,whatsapp,WhatsApp
+  - RULE-SET,ChatGPT-Domain,ChatGPT
+  #- GEOSITE,google-deepmind,Google
+  - GEOSITE,twitter,Twitter
+  - RULE-SET,Github-Domain,GitHub
+  - RULE-SET,Telegram-Domain,Telegram
+  - RULE-SET,Telegram-IP,Telegram,no-resolve
+  - RULE-SET,Facebook-Domain,Instagram
+  - GEOSITE,threads,Instagram
+  - GEOSITE,icloud,iCloud
+  - GEOSITE,apple-update,AppleUpdate
+  - RULE-SET,Apple-Domain,Apple
+  - RULE-SET,Apple-CN-Domain,Apple
+  - RULE-SET,Microsoft-Domain,Microsoft
+  - RULE-SET,Youtube-Domain,YouTube
+  - GEOSITE,pornhub,18+
+  - GEOSITE,xvideos,18+
+  - RULE-SET,TikTok-Domain,TikTok
+  - RULE-SET,Netflix-Domain,Netflix
+  - RULE-SET,Netflix-IP,Netflix,no-resolve
+  - RULE-SET,Spotify-Domain,Spotify
+  - GEOSITE,steam,Steam
+  - RULE-SET,Epic-Domain,Overseas
+  - RULE-SET,EA-Domain,Overseas
+  - RULE-SET,Blizzard-Domain,Overseas
+  - RULE-SET,UBI-Domain,Overseas
+  - RULE-SET,Sony-Domain,Overseas
+  - RULE-SET,Nintend-Domain,Overseas
+  - RULE-SET,Google-Domain,Google
+  - RULE-SET,Google-IP,Google,no-resolve
+  - RULE-SET,TEST-Domain,Test
+  - RULE-SET,FavSites-Domain,FavSites # 常用海外网站，域名规则托管在GitHub
+  - RULE-SET,Proxy-Domain,Overseas
+  - RULE-SET,Globe-Domain,Overseas
+  - GEOSITE,cn,CHN
+  - GEOIP,CN,CHN,no-resolve
+  - MATCH,Others
+secret: '123456'
+socks-port: 7891
+tproxy-port: 7895
+tun:
+  auto-detect-interface: false
+  auto-redirect: false
+  auto-route: false
+  device: utun
+  endpoint-independent-nat: true
+  stack: mixed
+  strict-route: false
+
+geodata-mode: true
+# 设置 GEO 文件加载模式
+geodata-loader: standard  # 或者 memconservative（根据内存情况选择）
+# 是否启用 GEO 文件自动更新
+geo-auto-update: true  # 启用自动更新
+# 设置 GEO 文件更新的间隔，单位为小时
+geo-update-interval: 24  # 每 24 小时更新一次
+
+geox-url:
+  geoip: "https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/geoip-lite.dat"
+  geosite: "https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/geosite.dat"
+  mmdb: "https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/country-lite.mmdb"
+  asn: "https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/GeoLite2-ASN.mmdb"
