@@ -20,13 +20,6 @@
 | 订阅1 | `SUF-` | `-PRM` |
 | 订阅2 | `LXY-` | `-BSC` |
 
-## Rule Providers
-
-- [MetaCubeX/meta-rules-dat](https://github.com/MetaCubeX/meta-rules-dat)
-- [blackmatrix7/ios_rule_script](https://github.com/blackmatrix7/ios_rule_script)
-- [AWAvenue-Ads-Rule](https://github.com/TG-Twilight/AWAvenue-Ads-Rule)
-- [chungccc/Ruleset](https://github.com/chungccc/Ruleset)
-- [liandu2024/clash](https://github.com/liandu2024/clash)
 
 ## Usage
 
