@@ -93,12 +93,6 @@ proxy-providers:
       additional-prefix: "LCB-"
       additional-suffix: "-PRM"
       proxy-name:
-      - {pattern: "香港", target: "-"}
-      - {pattern: "狮城", target: "-"}
-      - {pattern: "日本", target: "-"}
-      - {pattern: "台湾", target: "-"}
-      - {pattern: "美国", target: "-"}
-      - {pattern: "韩国", target: "-"}
       - {pattern: " ", target: ""}
   
   订阅C:
