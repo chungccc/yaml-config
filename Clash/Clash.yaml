@@ -1,0 +1,528 @@
+
+proxy-providers:
+  SUFE:
+    health-check:
+      enable: true
+      url: https://cp.cloudflare.com/generate_204
+      lazy: true
+      interval: 300
+      timeout: 3000
+    interval: 86400
+    path: ./providers/SUFE.yaml
+    type: http
+    url: 
+    filter: (香港|新加坡|日本)
+    override:
+      additional-prefix: SUF-
+      additional-suffix: -PRM
+  LXY:
+    health-check:
+      enable: true
+      url: https://cp.cloudflare.com/generate_204
+      lazy: true
+      interval: 300
+      timeout: 3000
+    interval: 86400
+    path: ./providers/LXY2.yaml
+    type: http
+    url: 
+    filter: (香港|新加坡|日本)
+    override:
+      additional-prefix: LXY-
+      additional-suffix: -BSC
+allow-lan: true
+listeners:
+  - name: socks5-in-1
+    type: socks
+    port: 10808
+    listen: 0.0.0.0
+    udp: true
+    users: []
+    proxy: DIRECT
+dns:
+  enable: true
+  enhanced-mode: fake-ip
+  fake-ip-range: 198.20.0.1/16
+  ipv6: true
+  listen: 0.0.0.0:7874
+  fake-ip-filter:
+    - +.lan
+    - +.local
+    - geosite:cn
+  nameserver:
+    - 202.96.134.33
+    - 202.96.128.86
+    - 223.5.5.5
+    - 119.29.29.29
+    - 1.12.12.12
+  default-nameserver:
+    - 223.5.5.5
+    - 119.29.29.29
+  nameserver-policy:
+    +.arpa: 192.168.2.1
+    geosite:cn:
+      - 223.5.5.5
+      - 119.29.29.29
+  proxy-server-nameserver:
+    - https://doh.pub/dns-query
+    - 223.5.5.5
+  fallback:
+    - tls://1.1.1.1:853
+    - tls://8.8.8.8:853
+    - tls://9.9.9.9:853
+  fallback-filter:
+    geoip: true
+    geoip-code: CN
+    geosite:
+      - gfw
+    domain:
+      - +.google.com
+      - +.facebook.com
+      - +.youtube.com
+ipv6: true
+log-level: info
+mixed-port: 7893
+mode: rule
+port: 7890
+profile:
+  store-fake-ip: true
+  store-selected: true
+unified-delay: true
+default:
+  proxies:
+    - HKG
+    - JPN
+    - SGP
+    - BSC
+    - Manual Choice
+    - Bypass
+    - Block
+  type: select
+proxies:
+  - name: 直连
+    type: direct
+    icon: https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/Direct.png
+  - name: 拒绝
+    type: reject
+    icon: https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/Reject.png
+proxy-groups:
+  - name: Instagram
+    proxies:
+      - HKG
+      - JPN
+      - SGP
+      - BSC
+      - Manual Choice
+      - Bypass
+      - Block
+    type: select
+    icon: https://fastly.jsdelivr.net/gh/chungccc/IconSet@main/instagram-256px.png
+  - name: Telegram
+    proxies:
+      - HKG
+      - JPN
+      - SGP
+      - BSC
+      - Manual Choice
+      - Bypass
+      - Block
+    type: select
+    icon: https://fastly.jsdelivr.net/gh/chungccc/IconSet@main/telegram-256px.png
+  - name: WhatsApp
+    proxies:
+      - HKG
+      - JPN
+      - SGP
+      - BSC
+      - Manual Choice
+      - Bypass
+      - Block
+    type: select
+    icon: https://fastly.jsdelivr.net/gh/chungccc/IconSet@main/whatsapp-256px.png
+  - name: Google
+    proxies:
+      - HKG
+      - JPN
+      - SGP
+      - BSC
+      - Manual Choice
+      - Bypass
+      - Block
+    type: select
+    icon: https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/Google_Search.png
+  - name: Emby
+    proxies:
+      - HKG
+      - JPN
+      - SGP
+      - BSC
+      - Manual Choice
+      - Bypass
+      - Block
+    type: select
+    icon: https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/Emby.png
+  - name: FavSites
+    proxies:
+      - HKG
+      - JPN
+      - SGP
+      - BSC
+      - Manual Choice
+      - Bypass
+      - Block
+    type: select
+    icon: https://fastly.jsdelivr.net/gh/chungccc/IconSet@main/heart.png
+  - name: Notification
+    proxies:
+      - HKG
+      - JPN
+      - SGP
+      - BSC
+      - Manual Choice
+      - Bypass
+      - Block
+    type: select
+    icon: https://fastly.jsdelivr.net/gh/chungccc/IconSet/imessage.png
+  - name: TikTok
+    proxies:
+      - HKG
+      - JPN
+      - SGP
+      - BSC
+      - Manual Choice
+      - Bypass
+      - Block
+    type: select
+    icon: https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/TikTok_1.png
+  - name: ChatGPT
+    proxies:
+      - HKG
+      - JPN
+      - SGP
+      - BSC
+      - Manual Choice
+      - Bypass
+      - Block
+    type: select
+    icon: https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/ChatGPT.png
+  - name: Twitter
+    proxies:
+      - HKG
+      - JPN
+      - SGP
+      - BSC
+      - Manual Choice
+      - Bypass
+      - Block
+    type: select
+    icon: https://cdn.worldvectorlogo.com/logos/x-2.svg
+  - name: YouTube
+    proxies:
+      - HKG
+      - JPN
+      - SGP
+      - BSC
+      - Manual Choice
+      - Bypass
+      - Block
+    type: select
+    icon: https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/YouTube.png
+  - name: Spotify
+    proxies:
+      - HKG
+      - JPN
+      - SGP
+      - BSC
+      - Manual Choice
+      - Bypass
+      - Block
+    type: select
+    icon: https://fastly.jsdelivr.net/gh/chungccc/IconSet@main/spotify-256px.png
+  - name: Apple
+    proxies:
+      - HKG
+      - JPN
+      - SGP
+      - BSC
+      - Manual Choice
+      - Bypass
+      - Block
+    type: select
+    icon: https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/Apple_1.png
+  - name: Overseas
+    proxies:
+      - HKG
+      - JPN
+      - SGP
+      - BSC
+      - Manual Choice
+      - Bypass
+      - Block
+    type: select
+    icon: https://fastly.jsdelivr.net/gh/chungccc/IconSet@main/oversea.png
+  - name: CHN
+    proxies:
+      - HKG
+      - JPN
+      - SGP
+      - BSC
+      - Manual Choice
+      - Bypass
+      - Block
+    type: select
+    icon: https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/China.png
+  - name: Others
+    proxies:
+      - HKG
+      - JPN
+      - SGP
+      - BSC
+      - Manual Choice
+      - Bypass
+      - Block
+    type: select
+    icon: https://fastly.jsdelivr.net/gh/chungccc/IconSet@main/exitrun.png
+  - name: AdsBlock
+    type: select
+    proxies:
+      - HKG
+      - JPN
+      - SGP
+      - BSC
+      - Manual Choice
+      - Bypass
+      - Block
+    icon: https://fastly.jsdelivr.net/gh/shindgew/WHATSINStash/icon/adguard.png
+  - name: HKG
+    type: url-test
+    include-all: true
+    url: https://cp.cloudflare.com/generate_204
+    interval: 300
+    tolerance: 20
+    lazy: true
+    filter: ^(?=.*(香港|HK|Hong Kong|HKG))(?=.*PRM).*$
+    icon: https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/Hong_Kong.png
+  - name: SGP
+    type: url-test
+    include-all: true
+    url: https://cp.cloudflare.com/generate_204
+    interval: 300
+    tolerance: 20
+    lazy: true
+    filter: ^(?=.*(新加坡|SG|Singapore|SGP))(?=.*PRM).*$
+    icon: https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/Singapore.png
+  - name: JPN
+    type: url-test
+    include-all: true
+    url: https://cp.cloudflare.com/generate_204
+    interval: 300
+    tolerance: 20
+    lazy: true
+    filter: ^(?=.*(日本|东京|JP|Japan|JPN))(?=.*PRM).*$
+    icon: https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/Japan.png
+  - name: BSC
+    type: select
+    filter: ^(?=.*(香港|HK|Hong Kong|HKG|JPN))(?=.*BSC).*$
+    include-all: true
+    icon: https://fastly.jsdelivr.net/gh/chungccc/IconSet@main/smart2.png
+  - name: Manual Choice
+    type: select
+    filter: ^((?!(拒绝|直连|Bypass|Block|HKG|JPN|SGP)).)*$
+    include-all: true
+    icon: https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/Static.png
+  - name: Bypass
+    type: select
+    proxies:
+      - 直连
+    icon: https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/Direct.png
+  - name: Block
+    type: select
+    proxies:
+      - 拒绝
+    icon: https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/Reject.png
+redir-port: 7892
+rule-anchor:
+  class:
+    behavior: classical
+    format: text
+    interval: 86400
+    type: http
+  domain:
+    behavior: domain
+    format: mrs
+    interval: 86400
+    type: http
+  ip:
+    behavior: ipcidr
+    format: mrs
+    interval: 86400
+    type: http
+rule-providers:
+  AWAvenue:
+    type: http
+    behavior: domain
+    format: yaml
+    path: ./rule_providers/AWAvenue-Ads-Rule-Clash.yaml
+    url: https://raw.githubusercontent.com/TG-Twilight/AWAvenue-Ads-Rule/main//Filters/AWAvenue-Ads-Rule-Clash.yaml
+    interval: 86400
+  Instagram-Domain:
+    behavior: domain
+    format: mrs
+    interval: 86400
+    type: http
+    url: https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/refs/heads/meta/geo/geosite/instagram.mrs
+  AI-Domain:
+    behavior: domain
+    format: mrs
+    interval: 86400
+    type: http
+    url: https://github.com/MetaCubeX/meta-rules-dat/raw/refs/heads/meta/geo/geosite/category-ai-!cn.mrs
+  Apple-Domain:
+    behavior: domain
+    format: mrs
+    interval: 86400
+    type: http
+    url: https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/apple.mrs
+  Apple-CN-Domain:
+    behavior: domain
+    format: mrs
+    interval: 86400
+    type: http
+    url: https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/apple-cn.mrs
+  ChatGPT-Domain:
+    behavior: domain
+    format: mrs
+    interval: 86400
+    type: http
+    url: https://github.com/MetaCubeX/meta-rules-dat/raw/refs/heads/meta/geo/geosite/openai.mrs
+  IMDb-Domain:
+    behavior: domain
+    format: mrs
+    interval: 86400
+    type: http
+    url: https://github.com/MetaCubeX/meta-rules-dat/raw/refs/heads/meta/geo/geosite/imdb.mrs
+  Facebook-Domain:
+    behavior: domain
+    format: mrs
+    interval: 86400
+    type: http
+    url: https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/facebook.mrs
+  Globe-Domain:
+    behavior: classical
+    format: text
+    interval: 86400
+    type: http
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/refs/heads/master/rule/Clash/Global/Global.list
+  Google-Domain:
+    behavior: domain
+    format: mrs
+    interval: 86400
+    type: http
+    url: https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/google.mrs
+  Google-IP:
+    behavior: ipcidr
+    format: mrs
+    interval: 86400
+    type: http
+    url: https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geoip/google.mrs
+  Proxy-Domain:
+    behavior: classical
+    format: text
+    interval: 86400
+    type: http
+    url: https://raw.githubusercontent.com/liandu2024/clash/refs/heads/main/list/Proxy.list
+  Spotify-Domain:
+    behavior: domain
+    format: mrs
+    interval: 86400
+    type: http
+    url: https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/spotify.mrs
+  Telegram-Domain:
+    behavior: domain
+    format: mrs
+    interval: 86400
+    type: http
+    url: https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/telegram.mrs
+  Telegram-IP:
+    behavior: ipcidr
+    format: mrs
+    interval: 86400
+    type: http
+    url: https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geoip/telegram.mrs
+  TikTok-Domain:
+    behavior: domain
+    format: mrs
+    interval: 86400
+    type: http
+    url: https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/tiktok.mrs
+  Youtube-Domain:
+    behavior: domain
+    format: mrs
+    interval: 86400
+    type: http
+    url: https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/youtube.mrs
+  Emby-Domain:
+    behavior: classical
+    format: yaml
+    interval: 86400
+    type: http
+    path: ./rule_provider/Emby.yaml
+    url: https://raw.githubusercontent.com/chungccc/Ruleset/refs/heads/main/Emby.yaml
+  IPTest-Domain:
+    behavior: classical
+    format: yaml
+    interval: 86400
+    type: http
+    path: ./rule_provider/IPTest.yaml
+    url: https://raw.githubusercontent.com/chungccc/Ruleset/refs/heads/main/IPTest.yaml
+  Directmod-Domain:
+    behavior: classical
+    format: yaml
+    interval: 86400
+    type: http
+    path: ./rule_provider/Directmod.yaml
+    url: https://raw.githubusercontent.com/chungccc/Ruleset/refs/heads/main/Directmod.yaml
+  FavSites-Domain:
+    behavior: classical
+    format: yaml
+    interval: 86400
+    type: http
+    path: ./rule_provider/FavSites.yaml
+    url: https://raw.githubusercontent.com/chungccc/Ruleset/refs/heads/main/FavSites.yaml
+rules:
+  - RULE-SET,AWAvenue,AdsBlock
+  - DOMAIN-SUFFIX,push.apple.com,Notification
+  - RULE-SET,Directmod-Domain,CHN
+  - RULE-SET,Emby-Domain,Emby
+  - RULE-SET,Instagram-Domain,Instagram
+  - GEOSITE,whatsapp,WhatsApp
+  - RULE-SET,ChatGPT-Domain,ChatGPT
+  - GEOSITE,twitter,Twitter
+  - RULE-SET,Telegram-Domain,Telegram
+  - RULE-SET,Telegram-IP,Telegram,no-resolve
+  - RULE-SET,Facebook-Domain,Instagram
+  - GEOSITE,threads,Instagram
+  - RULE-SET,Apple-Domain,Apple
+  - RULE-SET,Apple-CN-Domain,Apple
+  - RULE-SET,Youtube-Domain,YouTube
+  - RULE-SET,TikTok-Domain,TikTok
+  - RULE-SET,Spotify-Domain,Spotify
+  - RULE-SET,Google-Domain,Google
+  - RULE-SET,Google-IP,Google,no-resolve
+  - RULE-SET,FavSites-Domain,FavSites
+  - RULE-SET,Proxy-Domain,Overseas
+  - RULE-SET,Globe-Domain,Overseas
+  - GEOSITE,cn,直连
+  - GEOIP,CN,直连,no-resolve
+  - MATCH,Others
+secret: "123456"
+socks-port: 7891
+tproxy-port: 7895
+tun:
+  auto-detect-interface: false
+  auto-redirect: false
+  auto-route: false
+  device: utun
+  endpoint-independent-nat: true
+  stack: mixed
+  strict-route: false
